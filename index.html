@@ -1,0 +1,704 @@
+Birthday · HTML
+Copy
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>A Little Surprise 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Nunito', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+ 
+  body {
+    background: radial-gradient(ellipse at top, #2d1b4e 0%, #1a1033 60%, #0f0820 100%);
+    color: #fff;
+    position: relative;
+    animation: pageIn 0.9s ease;
+  }
+  @keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
+ 
+  /* Soft drifting color orbs in the background */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(70px);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .orb.pink     { background: #ffb6d9; width: 420px; height: 420px; top: -120px; left: -120px;     opacity: 0.32; animation: drift1 22s infinite ease-in-out; }
+  .orb.lavender { background: #c8a8ff; width: 520px; height: 520px; bottom: -160px; right: -120px; opacity: 0.32; animation: drift2 26s infinite ease-in-out; }
+  .orb.cream    { background: #fff0d6; width: 320px; height: 320px; top: 40%; right: 8%;           opacity: 0.18; animation: drift3 30s infinite ease-in-out; }
+ 
+  @keyframes drift1 { 0%,100% { transform: translate(0,0); }   50% { transform: translate(110px, 90px); } }
+  @keyframes drift2 { 0%,100% { transform: translate(0,0); }   50% { transform: translate(-90px, -70px); } }
+  @keyframes drift3 { 0%,100% { transform: translate(0,0); }   50% { transform: translate(-60px, 110px); } }
+ 
+  /* Twinkling stars */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle 3s infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.15; transform: scale(0.8); }
+    50%     { opacity: 1;    transform: scale(1.25); }
+  }
+ 
+  /* Confetti canvas (above everything) */
+  #confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+ 
+  /* Main scene */
+  .scene {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    padding: 24px;
+    transition: opacity 0.8s ease;
+  }
+  .scene.hidden { opacity: 0; pointer-events: none; }
+ 
+  /* Speech bubble */
+  .speech-bubble {
+    position: relative;
+    background: linear-gradient(135deg, #ffffff 0%, #ffeef7 100%);
+    color: #5a3a7e;
+    padding: 22px 28px;
+    border-radius: 28px;
+    font-weight: 700;
+    font-size: 1.12rem;
+    text-align: center;
+    max-width: 92%;
+    width: 380px;
+    box-shadow:
+      0 14px 44px rgba(180, 140, 220, 0.4),
+      0 0 0 4px rgba(255, 255, 255, 0.08);
+    margin-bottom: 28px;
+    animation: bubblePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    line-height: 1.4;
+  }
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-top: 16px solid #ffeef7;
+    filter: drop-shadow(0 4px 4px rgba(180, 140, 220, 0.2));
+  }
+  .speech-bubble.swap {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+  }
+  @keyframes bubblePop {
+    0%   { opacity: 0; transform: translateY(20px) scale(0.7); }
+    100% { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+ 
+  /* Cute character (was: cloud) */
+  .cloud {
+    width: clamp(180px, 36vw, 280px);
+    height: auto;
+    filter: drop-shadow(0 22px 50px rgba(200, 168, 255, 0.5));
+    animation: float 4s infinite ease-in-out;
+    transition: opacity 1.2s ease, transform 1.4s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-18px); }
+  }
+  .cloud.away {
+    opacity: 0;
+    transform: translateY(-150vh) scale(0.7);
+  }
+ 
+  /* Controls */
+  .controls {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 420px;
+    transition: opacity 0.5s ease;
+  }
+ 
+  .name-input {
+    width: 100%;
+    padding: 16px 22px;
+    border: none;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #5a3a7e;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    outline: none;
+    box-shadow: 0 8px 30px rgba(180, 140, 220, 0.3);
+    text-align: center;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .name-input::placeholder { color: #b89dd6; font-weight: 500; }
+  .name-input:focus        { box-shadow: 0 8px 30px rgba(255, 182, 217, 0.55); transform: translateY(-1px); }
+ 
+  .btn {
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    padding: 14px 32px;
+    border-radius: 50px;
+    box-shadow: 0 8px 24px rgba(180, 140, 220, 0.4);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.3s ease;
+    color: #5a3a7e;
+    user-select: none;
+  }
+  .btn:hover  { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 32px rgba(180, 140, 220, 0.55); }
+  .btn:active { transform: translateY(-1px) scale(1); }
+ 
+  .btn.primary { background: linear-gradient(135deg, #ffd6ec 0%, #e0c8ff 100%); }
+  .btn.yes     { background: linear-gradient(135deg, #fff3a8 0%, #ffd6ec 100%); }
+ 
+  .btn.no {
+    background: linear-gradient(135deg, #d8d8e8 0%, #b8b8c8 100%);
+    color: #6a6a7a;
+    position: fixed;
+    z-index: 50;
+    left: -400px;
+    top: -400px;
+    transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                top  0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.18s ease,
+                box-shadow 0.18s ease;
+  }
+ 
+  .yn-row {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: rowIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+ 
+  /* ============================================================
+     LETTER SCENE  —  envelope opening sequence + final card
+     ============================================================ */
+  .letter-scene {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s ease;
+  }
+  .letter-scene.show { opacity: 1; pointer-events: auto; }
+ 
+  .envelope-frame {
+    position: relative;
+    width: clamp(240px, 68vw, 360px);
+    height: clamp(300px, 85vw, 450px);
+    max-height: 65vh;
+    margin-bottom: 22px;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+  }
+  .envelope-frame:hover { transform: translateY(-4px) scale(1.01); }
+  .envelope-frame.opened, .envelope-frame.opened:hover { cursor: default; transform: none; }
+ 
+  /* Envelope frames have black backgrounds in the source images.
+     mix-blend-mode: lighten makes pure black blend invisibly into
+     the dark page background while preserving the kraft tones. */
+  .env {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    mix-blend-mode: lighten;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
+  }
+ 
+  .envelope-frame .env-1 {
+    opacity: 1;
+    animation: glow 2.6s infinite ease-in-out;
+  }
+  @keyframes glow {
+    0%,100% { filter: drop-shadow(0 0 18px rgba(255, 220, 240, 0.35))
+                     drop-shadow(0 10px 28px rgba(200, 168, 255, 0.35)); }
+    50%     { filter: drop-shadow(0 0 50px rgba(255, 220, 240, 0.85))
+                     drop-shadow(0 10px 38px rgba(200, 168, 255, 0.6)); }
+  }
+ 
+  .envelope-frame.stage-2 .env-1 { opacity: 0; animation: none; }
+  .envelope-frame.stage-2 .env-2 { opacity: 1; }
+  .envelope-frame.stage-3 .env-2 { opacity: 0; }
+  .envelope-frame.stage-3 .env-3 { opacity: 1; }
+  .envelope-frame.stage-final .env-3 { opacity: 0; }
+ 
+  /* Final card lifts out of envelope: scales up and lights up */
+  .final-card {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transform: scale(0.45) translateY(8%);
+    transform-origin: center;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    border-radius: 6px;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.55))
+            drop-shadow(0 0 60px rgba(255, 200, 230, 0.25));
+  }
+  .envelope-frame.stage-final .final-card {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    transition: opacity 1s ease,
+                transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+ 
+  .cursive {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #ffd6ec;
+    margin-top: 6px;
+    text-align: center;
+    text-shadow: 0 2px 18px rgba(255, 182, 217, 0.55);
+    line-height: 1.2;
+    transition: opacity 0.8s ease;
+  }
+  .cursive.fade { opacity: 0; }
+ 
+  .hint {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.55);
+    font-style: italic;
+    animation: pulse 2s infinite ease-in-out;
+    transition: opacity 0.6s ease;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 0.45; }
+    50%     { opacity: 1; }
+  }
+ 
+  .final-message {
+    margin-top: 18px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.65rem;
+    color: #ffeef7;
+    text-align: center;
+    max-width: 92%;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;
+    text-shadow: 0 2px 22px rgba(255, 182, 217, 0.6);
+    line-height: 1.4;
+  }
+  .final-message.show { opacity: 1; transform: translateY(0); }
+ 
+  @media (max-width: 480px) {
+    .speech-bubble  { font-size: 1rem; padding: 18px 22px; }
+    .cursive        { font-size: 1.55rem; }
+    .final-message  { font-size: 1.32rem; margin-top: 14px; }
+    .btn            { padding: 12px 26px; font-size: 1rem; }
+    .name-input     { padding: 14px 20px; font-size: 1rem; }
+    .controls       { margin-top: 22px; }
+    .envelope-frame { margin-bottom: 16px; }
+  }
+</style>
+</head>
+<body>
+  <div class="orb pink"></div>
+  <div class="orb lavender"></div>
+  <div class="orb cream"></div>
+  <div class="stars" id="stars"></div>
+  <canvas id="confetti"></canvas>
+ 
+  <div class="scene" id="scene">
+    <div class="speech-bubble" id="bubble">Hi there! What's your name? 🌸</div>
+    <img src="wink.gif" class="cloud" id="cloud" alt="">
+    <div class="controls" id="controls">
+      <input type="text" class="name-input" id="nameInput" placeholder="type your name..." maxlength="30" autocomplete="off" autocapitalize="words">
+      <button class="btn primary" id="nextBtn">Next →</button>
+    </div>
+  </div>
+ 
+  <div class="letter-scene" id="letterScene">
+    <div class="envelope-frame" id="envelopeFrame">
+      <img src="envelope1.png" class="env env-1" alt="">
+      <img src="envelope2.png" class="env env-2" alt="">
+      <img src="envelope3.png" class="env env-3" alt="">
+      <img src="Final_card.jpg" class="final-card" alt="">
+    </div>
+    <p class="cursive" id="cursiveText">A letter for you 💌</p>
+    <p class="hint" id="hintText">click to open...</p>
+    <p class="final-message" id="finalMessage"></p>
+  </div>
+ 
+  <script>
+    /* =================== STARS =================== */
+    (function makeStars() {
+      const container = document.getElementById('stars');
+      const count = 130;
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const size = Math.random() * 2.5 + 0.5;
+        s.style.width  = size + 'px';
+        s.style.height = size + 'px';
+        s.style.left   = Math.random() * 100 + '%';
+        s.style.top    = Math.random() * 100 + '%';
+        s.style.animationDelay    = (Math.random() * 3) + 's';
+        s.style.animationDuration = (2 + Math.random() * 3) + 's';
+        frag.appendChild(s);
+      }
+      container.appendChild(frag);
+    })();
+ 
+    /* =================== CONFETTI (canvas, no library) =================== */
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let cw = 0, ch = 0;
+    function resizeCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cw = window.innerWidth;
+      ch = window.innerHeight;
+      canvas.width  = cw * dpr;
+      canvas.height = ch * dpr;
+      canvas.style.width  = cw + 'px';
+      canvas.style.height = ch + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+ 
+    const PASTEL = ['#ffb6d9','#ffd6ec','#e0c8ff','#c8a8ff','#fff3a8','#ffeef7','#ffc4e1','#b8e0ff','#ffb3c1'];
+    const pieces = [];
+ 
+    function makePiece(x, y, opts) {
+      opts = opts || {};
+      const isHeart = Math.random() < 0.45;
+      return {
+        x: x, y: y,
+        vx: (Math.random() - 0.5) * (opts.spread || 8),
+        vy: opts.upward ? -(Math.random() * 8 + 4) : (Math.random() * 3 + 2),
+        gravity: 0.18,
+        size: 7 + Math.random() * 9,
+        rot: Math.random() * Math.PI * 2,
+        vrot: (Math.random() - 0.5) * 0.28,
+        color: PASTEL[Math.floor(Math.random() * PASTEL.length)],
+        type: isHeart ? 'heart' : 'rect'
+      };
+    }
+ 
+    function burst(x, y, n) {
+      n = n || 55;
+      for (let i = 0; i < n; i++) pieces.push(makePiece(x, y, { spread: 14, upward: true }));
+    }
+ 
+    function rain(n) {
+      n = n || 200;
+      for (let i = 0; i < n; i++) {
+        const p = makePiece(Math.random() * cw, -20 - Math.random() * ch * 0.5);
+        p.vy = Math.random() * 3 + 2;
+        pieces.push(p);
+      }
+    }
+ 
+    function drawHeart(x, y, size, rot, color) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const s = size / 2;
+      ctx.moveTo(0, s * 0.3);
+      ctx.bezierCurveTo(0,  -s * 0.2, -s, -s * 0.2, -s, s * 0.3);
+      ctx.bezierCurveTo(-s,  s * 0.7,  0,  s,        0, s * 1.1);
+      ctx.bezierCurveTo(0,   s,        s,  s * 0.7,  s, s * 0.3);
+      ctx.bezierCurveTo(s,  -s * 0.2,  0, -s * 0.2,  0, s * 0.3);
+      ctx.fill();
+      ctx.restore();
+    }
+ 
+    function tick() {
+      ctx.clearRect(0, 0, cw, ch);
+      for (let i = pieces.length - 1; i >= 0; i--) {
+        const p = pieces[i];
+        p.vy += p.gravity;
+        p.x  += p.vx;
+        p.y  += p.vy;
+        p.rot += p.vrot;
+        p.vx *= 0.992;
+        if (p.y > ch + 40 || p.x < -80 || p.x > cw + 80) {
+          pieces.splice(i, 1);
+          continue;
+        }
+        if (p.type === 'heart') {
+          drawHeart(p.x, p.y, p.size, p.rot, p.color);
+        } else {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.55);
+          ctx.restore();
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+    tick();
+ 
+    /* =================== STATE =================== */
+    const state = { step: 1, name: '' };
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+ 
+    const bubble         = document.getElementById('bubble');
+    const controls       = document.getElementById('controls');
+    const cloud          = document.getElementById('cloud');
+    const scene          = document.getElementById('scene');
+    const letterScene    = document.getElementById('letterScene');
+    const envelopeFrame  = document.getElementById('envelopeFrame');
+    const cursiveText    = document.getElementById('cursiveText');
+    const hintText       = document.getElementById('hintText');
+    const finalMessage   = document.getElementById('finalMessage');
+ 
+    function setBubble(text) {
+      bubble.classList.add('swap');
+      setTimeout(() => {
+        bubble.textContent = text;
+        bubble.classList.remove('swap');
+      }, 340);
+    }
+ 
+    function getCloudCenter() {
+      const r = cloud.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+ 
+    /* =================== STEP 1: NAME =================== */
+    const nameInput = document.getElementById('nameInput');
+    const nextBtn   = document.getElementById('nextBtn');
+ 
+    function submitName() {
+      const v = nameInput.value.trim();
+      if (!v) {
+        nameInput.focus();
+        nameInput.style.boxShadow = '0 8px 30px rgba(255,160,180,0.7)';
+        setTimeout(() => { nameInput.style.boxShadow = ''; }, 600);
+        return;
+      }
+      state.name = v.charAt(0).toUpperCase() + v.slice(1);
+      goStep2();
+    }
+    nextBtn.addEventListener('click', submitName);
+    nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitName(); });
+    setTimeout(() => { try { nameInput.focus(); } catch (e) {} }, 700);
+ 
+    /* =================== STEPS 2 & 3: YES / FLEEING NO =================== */
+    let noMobileTimer = null;
+    let noEl = null;
+ 
+    function cleanupNo() {
+      if (noMobileTimer) { clearInterval(noMobileTimer); noMobileTimer = null; }
+      if (noEl && noEl.parentNode) noEl.parentNode.removeChild(noEl);
+      noEl = null;
+    }
+ 
+    function buildYesNo(yesHandler) {
+      cleanupNo();
+      controls.innerHTML = '';
+ 
+      const row = document.createElement('div');
+      row.className = 'yn-row';
+ 
+      const yes = document.createElement('button');
+      yes.className = 'btn yes';
+      yes.textContent = 'YES 💛';
+      yes.addEventListener('click', yesHandler);
+ 
+      const no = document.createElement('button');
+      no.className = 'btn no';
+      no.textContent = 'no...';
+      noEl = no;
+ 
+      row.appendChild(yes);
+      controls.appendChild(row);
+      document.body.appendChild(no);
+ 
+      function moveTo(nx, ny) {
+        const r = no.getBoundingClientRect();
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const m = 12;
+        nx = Math.max(m, Math.min(nx, w - r.width - m));
+        ny = Math.max(m, Math.min(ny, h - r.height - m));
+        no.style.left = nx + 'px';
+        no.style.top  = ny + 'px';
+      }
+ 
+      function runAway(e) {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const r = no.getBoundingClientRect();
+        const bw = r.width, bh = r.height;
+        const m = 12;
+        let nx = 0, ny = 0, attempts = 0;
+        do {
+          nx = m + Math.random() * Math.max(w - bw - m * 2, 50);
+          ny = m + Math.random() * Math.max(h - bh - m * 2, 50);
+          attempts++;
+          if (!e || !('clientX' in e)) break;
+          const cx = nx + bw / 2, cy = ny + bh / 2;
+          if (Math.hypot(cx - e.clientX, cy - e.clientY) > 220) break;
+        } while (attempts < 12);
+        moveTo(nx, ny);
+      }
+ 
+      // Slide in from off-screen to a spot near the YES button
+      requestAnimationFrame(() => {
+        const rr = row.getBoundingClientRect();
+        const nr = no.getBoundingClientRect();
+        let nx = rr.right + 16;
+        let ny = rr.top;
+        if (nx + nr.width > window.innerWidth - 12) {
+          nx = Math.max(12, rr.left + rr.width / 2 - nr.width / 2);
+          ny = rr.bottom + 16;
+        }
+        moveTo(nx, ny);
+      });
+ 
+      no.addEventListener('mouseenter', runAway);
+      no.addEventListener('focus', runAway);
+      no.addEventListener('click', e => { e.preventDefault(); runAway(); });
+ 
+      // On touch devices: hop every 1.5s so it can't be tapped reliably
+      if (isTouch) {
+        noMobileTimer = setInterval(() => runAway(), 1500);
+      }
+    }
+ 
+    function goStep2() {
+      state.step = 2;
+      setBubble(`Hello, ${state.name}! Are you the coolest mother in the world? 💖`);
+      setTimeout(() => {
+        buildYesNo(() => {
+          cleanupNo();
+          const c = getCloudCenter();
+          burst(c.x, c.y, 55);
+          setTimeout(goStep3, 700);
+        });
+      }, 460);
+    }
+ 
+    function goStep3() {
+      state.step = 3;
+      setBubble('And are you the most wonderful mom in the whole universe? 🌙✨');
+      setTimeout(() => {
+        buildYesNo(() => {
+          cleanupNo();
+          const c = getCloudCenter();
+          burst(c.x, c.y, 65);
+          setTimeout(goReveal, 800);
+        });
+      }, 460);
+    }
+ 
+    /* =================== REVEAL =================== */
+    function goReveal() {
+      state.step = 4;
+      bubble.classList.add('swap');
+      controls.style.opacity = '0';
+      cloud.classList.add('away');
+ 
+      setTimeout(() => {
+        scene.classList.add('hidden');
+        cursiveText.textContent = `A letter for you, ${state.name} 💌`;
+        letterScene.classList.add('show');
+      }, 1300);
+    }
+ 
+    /* =================== ENVELOPE OPENING SEQUENCE =================== */
+    envelopeFrame.addEventListener('click', () => {
+      if (envelopeFrame.classList.contains('opened')) return;
+      envelopeFrame.classList.add('opened');
+      hintText.style.opacity = '0';
+ 
+      // Sequential opening: sealed → flap up → card peeking → final card
+      setTimeout(() => envelopeFrame.classList.add('stage-2'),     120);
+      setTimeout(() => envelopeFrame.classList.add('stage-3'),     820);
+      setTimeout(() => envelopeFrame.classList.add('stage-final'), 1550);
+ 
+      // Hide the "A letter for you" once the card is taking the stage
+      setTimeout(() => cursiveText.classList.add('fade'), 1600);
+ 
+      // Confetti waves throughout the reveal
+      setTimeout(() => rain(180), 200);
+      setTimeout(() => rain(140), 900);
+      setTimeout(() => rain(140), 1700);
+      setTimeout(() => rain(100), 2500);
+ 
+      // Final message after the card has scaled up
+      setTimeout(() => {
+        finalMessage.innerHTML = `Happy Birthday, ${state.name}!<br>I love you to the moon and back. 🌙`;
+        finalMessage.classList.add('show');
+      }, 2600);
+    });
+  </script>
+</body>
+</html>
